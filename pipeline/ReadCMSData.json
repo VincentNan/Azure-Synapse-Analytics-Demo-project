@@ -277,10 +277,10 @@
 				"type": "String",
 				"defaultValue": "value"
 			},
-			"downloadURL": {
+			"fileExtension": {
 				"type": "String"
 			},
-			"fileExtension": {
+			"downloadURL": {
 				"type": "String"
 			}
 		},
