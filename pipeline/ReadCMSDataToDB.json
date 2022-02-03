@@ -266,7 +266,13 @@
 							"outputs": [
 								{
 									"referenceName": "SinkDelimitedText",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"dbFile": {
+											"value": "@variables('sinkFileName')",
+											"type": "Expression"
+										}
+									}
 								}
 							]
 						}
