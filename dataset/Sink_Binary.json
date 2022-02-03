@@ -1,0 +1,28 @@
+{
+	"name": "Sink_Binary",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureBlobStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"sinkFileName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobStorageLocation",
+				"fileName": {
+					"value": "@dataset().sinkFileName",
+					"type": "Expression"
+				},
+				"folderPath": "CMS_Data/download",
+				"container": "vincentnan"
+			}
+		}
+	},
+	"type": "Microsoft.Synapse/workspaces/datasets"
+}

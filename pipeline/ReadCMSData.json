@@ -1,0 +1,269 @@
+{
+	"name": "ReadCMSData",
+	"properties": {
+		"activities": [
+			{
+				"name": "Each Download",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Set Items",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('items')",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Read Download URL",
+							"type": "WebActivity",
+							"dependsOn": [
+								{
+									"activity": "Set Identifier",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "Set Base URL",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								},
+								{
+									"activity": "Set Download File Name",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"url": {
+									"value": "@concat(variables('baseURL'),variables('identifier'))",
+									"type": "Expression"
+								},
+								"connectVia": {
+									"referenceName": "AutoResolveIntegrationRuntime",
+									"type": "IntegrationRuntimeReference"
+								},
+								"method": "GET"
+							}
+						},
+						{
+							"name": "Set Download URL",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Read Download URL",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "downloadURL",
+								"value": {
+									"value": "@activity('Read Download URL').output.distribution[0].downloadURL",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Download File",
+							"type": "Copy",
+							"dependsOn": [
+								{
+									"activity": "Set Download URL",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "BinarySource",
+									"storeSettings": {
+										"type": "HttpReadSettings",
+										"requestMethod": "GET"
+									},
+									"formatSettings": {
+										"type": "BinaryReadSettings"
+									}
+								},
+								"sink": {
+									"type": "BinarySink",
+									"storeSettings": {
+										"type": "AzureBlobStorageWriteSettings"
+									}
+								},
+								"enableStaging": false
+							},
+							"inputs": [
+								{
+									"referenceName": "Source_Binary",
+									"type": "DatasetReference",
+									"parameters": {
+										"downloadURL": {
+											"value": "@variables('downloadURL')",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "Sink_Binary",
+									"type": "DatasetReference",
+									"parameters": {
+										"sinkFileName": {
+											"value": "@variables('sinkFileName')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "Set Identifier",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "identifier",
+								"value": {
+									"value": "@item().CMSID",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set Base URL",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "baseURL",
+								"value": {
+									"value": "@item().BaseURL",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set Download File Name",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "sinkFileName",
+								"value": {
+									"value": "@item().SinkFileName",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Set Items",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Look up Configure Data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "items",
+					"value": {
+						"value": "@activity('Look up Configure Data').output.value",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Look up Configure Data",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobStorageReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "Source_config",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			}
+		],
+		"variables": {
+			"items": {
+				"type": "Array",
+				"defaultValue": [
+					1
+				]
+			},
+			"baseURL": {
+				"type": "String"
+			},
+			"identifier": {
+				"type": "String"
+			},
+			"sinkFileName": {
+				"type": "String",
+				"defaultValue": "sinkDownload.csv"
+			},
+			"downloadURL": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"lastPublishTime": "2022-02-02T22:34:15Z"
+	},
+	"type": "Microsoft.Synapse/workspaces/pipelines"
+}
