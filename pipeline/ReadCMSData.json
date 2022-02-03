@@ -140,7 +140,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"sinkFileName": {
-											"value": "@variables('sinkFileName')",
+											"value": "@concat(variables('sinkFileName'),'.', variables('fileExtension'))",
 											"type": "Expression"
 										}
 									}
@@ -182,6 +182,19 @@
 								"variableName": "sinkFileName",
 								"value": {
 									"value": "@item().SinkFileName",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set Download File Extension",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "fileExtension",
+								"value": {
+									"value": "@item().FileExtension",
 									"type": "Expression"
 								}
 							}
@@ -259,6 +272,9 @@
 				"defaultValue": "value"
 			},
 			"downloadURL": {
+				"type": "String"
+			},
+			"fileExtension": {
 				"type": "String"
 			}
 		},
