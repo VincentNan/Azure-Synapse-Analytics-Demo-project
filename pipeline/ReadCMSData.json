@@ -146,7 +146,7 @@
 									"type": "DatasetReference",
 									"parameters": {
 										"sinkFileName": {
-											"value": "@concat(variables('sinkFileName'),'-',formatDateTime(utcNow(), 'yyyy-MMM-dd'),'.', variables('fileExtension'))",
+											"value": "@concat(variables('sinkFileName'),'-',formatDateTime(utcNow(), 'yyyy-MM-dd'),'.', variables('fileExtension'))",
 											"type": "Expression"
 										}
 									}
