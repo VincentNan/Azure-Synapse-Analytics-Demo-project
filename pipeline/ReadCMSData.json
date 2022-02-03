@@ -256,7 +256,7 @@
 			},
 			"sinkFileName": {
 				"type": "String",
-				"defaultValue": "sinkDownload.csv"
+				"defaultValue": "value"
 			},
 			"downloadURL": {
 				"type": "String"
