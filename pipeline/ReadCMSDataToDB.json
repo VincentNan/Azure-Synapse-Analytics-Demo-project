@@ -260,7 +260,13 @@
 							"inputs": [
 								{
 									"referenceName": "Source_DelimitedText",
-									"type": "DatasetReference"
+									"type": "DatasetReference",
+									"parameters": {
+										"dbFile": {
+											"value": "@concat(variables('sinkFileName'),'-',formatDateTime(utcNow(), 'yyyy-MM-dd'),'.', variables('fileExtension'))",
+											"type": "Expression"
+										}
+									}
 								}
 							],
 							"outputs": [
