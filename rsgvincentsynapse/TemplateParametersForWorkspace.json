@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"workspaceName": {
+			"value": "rsgvincentsynapse"
+		},
+		"AzureBlobStorage1_connectionString": {
+			"value": ""
+		},
+		"rsgvincentsynapse-WorkspaceDefaultSqlServer_connectionString": {
+			"value": ""
+		},
+		"HttpServerDownload_properties_typeProperties_url": {
+			"value": "@{linkedService().downloadURL}"
+		},
+		"rsgvincentsynapse-WorkspaceDefaultStorage_properties_typeProperties_url": {
+			"value": "https://vincentnan.dfs.core.windows.net"
+		}
+	}
+}
