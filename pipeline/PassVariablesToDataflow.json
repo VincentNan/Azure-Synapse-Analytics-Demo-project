@@ -1,0 +1,23 @@
+{
+	"name": "PassVariablesToDataflow",
+	"properties": {
+		"activities": [
+			{
+				"name": "Set variable Value",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "auditID",
+					"value": "100"
+				}
+			}
+		],
+		"variables": {
+			"auditID": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}

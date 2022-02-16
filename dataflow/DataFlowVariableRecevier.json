@@ -1,0 +1,19 @@
+{
+	"name": "DataFlowVariableRecevier",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "RecevieColumnOutput"
+				},
+				{
+					"name": "DataFlowVariable"
+				}
+			],
+			"script": "parameters{\n\tdataflow_audit_id as string (Audit_ID)\n}\ncompose(composition: 'undefined') ~> DataFlowVariable@(temporary)\nDataFlowVariable@temporary derive(Audit_ID = $dataflow_audit_id) ~> RecevieColumnOutput"
+		}
+	}
+}
