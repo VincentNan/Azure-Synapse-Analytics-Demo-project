@@ -1,0 +1,28 @@
+{
+	"name": "DataFlowVariableRecevier",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Source_config",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"name": "sink1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "RecevieColumnOutput"
+				}
+			],
+			"script": "parameters{\n\tdataflow_audit_id as string\n}\nsource(output(\n\t\tBaseURL as string,\n\t\tCMSID as string,\n\t\tDescription as string,\n\t\tSinkFileName as string,\n\t\tFileExtension as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource1 derive(Audit_ID = $dataflow_audit_id) ~> RecevieColumnOutput\nRecevieColumnOutput sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tstore: 'cache',\n\tformat: 'inline',\n\toutput: false,\n\tsaveOrder: 1,\n\tmapColumn(\n\t\tBaseURL,\n\t\tCMSID,\n\t\tDescription,\n\t\tSinkFileName,\n\t\tFileExtension,\n\t\tAudit_ID\n\t)) ~> sink1"
+		}
+	}
+}

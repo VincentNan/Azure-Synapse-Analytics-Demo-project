@@ -1,0 +1,60 @@
+{
+	"name": "PassVariablesToDataflow",
+	"properties": {
+		"activities": [
+			{
+				"name": "Set variable Value",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "auditID",
+					"value": "Vincent"
+				}
+			},
+			{
+				"name": "DataFlowVariableRecevier",
+				"type": "ExecuteDataFlow",
+				"dependsOn": [
+					{
+						"activity": "Set variable Value",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "1.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "DataFlowVariableRecevier",
+						"type": "DataFlowReference",
+						"parameters": {
+							"dataflow_audit_id": {
+								"value": "'@{variables('auditID')}'",
+								"type": "Expression"
+							}
+						}
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"traceLevel": "Fine"
+				}
+			}
+		],
+		"variables": {
+			"auditID": {
+				"type": "String"
+			}
+		},
+		"annotations": []
+	}
+}
