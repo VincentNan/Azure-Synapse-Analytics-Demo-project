@@ -1,0 +1,65 @@
+{
+	"name": "Notebook 1",
+	"properties": {
+		"nbformat": 4,
+		"nbformat_minor": 2,
+		"sessionProperties": {
+			"driverMemory": "28g",
+			"driverCores": 4,
+			"executorMemory": "28g",
+			"executorCores": 4,
+			"numExecutors": 2,
+			"conf": {
+				"spark.dynamicAllocation.enabled": "false",
+				"spark.dynamicAllocation.minExecutors": "2",
+				"spark.dynamicAllocation.maxExecutors": "2",
+				"spark.autotune.trackingId": "883a3ecb-6cfa-4363-bc25-bf0c9271b59a"
+			}
+		},
+		"metadata": {
+			"saveOutput": true,
+			"enableDebugMode": false,
+			"kernelspec": {
+				"name": "synapse_pyspark",
+				"display_name": "python"
+			},
+			"language_info": {
+				"name": "python"
+			},
+			"sessionKeepAliveTimeout": 30
+		},
+		"cells": [
+			{
+				"cell_type": "code",
+				"source": [
+					"from datetime import datetime\n",
+					"from pyspark.sql.types import StructType, StructField, IntegerType, StringType, TimestampType\n",
+					"\n",
+					"# 1. Define sample data matching your external table schema\n",
+					"data = [\n",
+					"    (1, \"Alice Johnson\", \"ON\", datetime(2026, 11, 11, 10, 0, 0)),\n",
+					"    (2, \"Bob Tremblay\", \"QC\", datetime(2026, 11, 11, 10, 5, 0)),\n",
+					"    (3, \"Charlie Singh\", \"BC\", datetime(2026, 11, 11, 10, 10, 0))\n",
+					"]\n",
+					"\n",
+					"schema = StructType([\n",
+					"    StructField(\"CustomerID\", IntegerType(), True),\n",
+					"    StructField(\"FullName\", StringType(), True),\n",
+					"    StructField(\"Province\", StringType(), True),\n",
+					"    StructField(\"UpdatedAt\", TimestampType(), True)\n",
+					"])\n",
+					"\n",
+					"df = spark.createDataFrame(data, schema)\n",
+					"\n",
+					"# 2. Write as a Delta table to your exact ADLS Gen2 path\n",
+					"delta_path = \"abfss://azuresynapsevcc@azuresynapsevcc.dfs.core.windows.net/vccfamily/vcc-root/customers/\"\n",
+					"df.write.format(\"delta\").mode(\"overwrite\").save(delta_path)\n",
+					"\n",
+					"print(\"Delta table created successfully!\")\n",
+					""
+				],
+				"execution_count": null
+			}
+		]
+	}
+}
