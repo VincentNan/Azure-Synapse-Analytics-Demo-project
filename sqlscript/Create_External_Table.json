@@ -1,0 +1,17 @@
+{
+	"name": "Create_External_Table",
+	"properties": {
+		"content": {
+			"query": "-- ============================================================================\n-- Idempotent External Delta Table Setup for Azure Synapse Serverless SQL\n-- ============================================================================\n\n-- 0. Switch to your user database (uncomment and replace with your DB name)\n-- USE [SalesAnalyticsDB];\n-- GO\n\n-- ============================================================================\n-- STEP 1: Clean up existing objects in reverse dependency order\n-- ============================================================================\nIF OBJECT_ID('dbo.DimCustomer', 'U') IS NOT NULL\n    DROP EXTERNAL TABLE dbo.DimCustomer;\nGO\n\nIF EXISTS (SELECT * FROM sys.external_file_formats WHERE name = 'DeltaFormat')\n    DROP EXTERNAL FILE FORMAT [DeltaFormat];\nGO\n\nIF EXISTS (SELECT * FROM sys.external_data_sources WHERE name = 'SilverDataLake')\n    DROP EXTERNAL DATA SOURCE [SilverDataLake];\nGO\n\nIF EXISTS (SELECT * FROM sys.database_scoped_credentials WHERE name = 'SynapseManagedIdentity')\n    DROP DATABASE SCOPED CREDENTIAL [SynapseManagedIdentity];\nGO\n\n-- ============================================================================\n-- STEP 2: Create Master Key (only if one does not already exist in this DB)\n-- ============================================================================\nIF NOT EXISTS (SELECT * FROM sys.symmetric_keys WHERE name = '##MS_DatabaseMasterKey##')\nBEGIN\n    CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'YourStrongPassword123!';\nEND\nGO\n\n-- ============================================================================\n-- STEP 3: Create Credential, Data Source, File Format & External Table\n-- ============================================================================\nCREATE DATABASE SCOPED CREDENTIAL [SynapseManagedIdentity]\nWITH IDENTITY = 'Managed Identity';\nGO\n\nCREATE EXTERNAL DATA SOURCE [SilverDataLake]\nWITH (\n    LOCATION = 'abfss://azuresynapsevcc@azuresynapsevcc.dfs.core.windows.net/vccfamily/vcc-root',\n    CREDENTIAL = [SynapseManagedIdentity]\n);\nGO\n\nCREATE EXTERNAL FILE FORMAT [DeltaFormat]\nWITH (\n    FORMAT_TYPE = DELTA\n);\nGO\n\nCREATE EXTERNAL TABLE dbo.DimCustomer (\n    CustomerID INT,\n    FullName NVARCHAR(100),\n    Province NVARCHAR(50),\n    UpdatedAt DATETIME2\n)\nWITH (\n    LOCATION = '/customers/',\n    DATA_SOURCE = [SilverDataLake],\n    FILE_FORMAT = [DeltaFormat]\n);\nGO\n\n-- ============================================================================\n-- STEP 4: Verify the External Delta Table\n-- ============================================================================\nSELECT TOP 10 * FROM dbo.DimCustomer;\nGO\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "vcc-family",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
